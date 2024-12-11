@@ -113,9 +113,9 @@ def load_video_urls(json_path):
 if __name__ == '__main__':
     # Example usage:
     video_urls = [
-        'https://example.com/video1.mp4',
-        'https://example.com/video2.mp4',
-        'https://example.com/video3.mp4'
+        'https://vj-video.s3.us-east-1.amazonaws.com//612afec9-bcb2-47ca-807b-756d6e83b4b7/f4aa6faa-a7e3-438c-9392-7f58127125ec/video.mp4?AWSAccessKeyId=AKIATTF3CDVL4EYACA6F&Signature=2BczKZ4gQ6RFTeWZbP8LOIc9mZw%3D&Expires=1733963524',
+        'https://vj-video.s3.us-east-1.amazonaws.com//612afec9-bcb2-47ca-807b-756d6e83b4b7/c59248ec-405e-4051-b872-a4dbde6a1442/video.mp4?AWSAccessKeyId=AKIATTF3CDVL4EYACA6F&Signature=lqfaBNGrYLOuk4n2x2ktcD5MK0w%3D&Expires=1733963524',
+        'https://vj-video.s3.us-east-1.amazonaws.com//612afec9-bcb2-47ca-807b-756d6e83b4b7/48310b2a-5eaa-424b-bd1b-ed2c3a5a10d1/video.mp4?AWSAccessKeyId=AKIATTF3CDVL4EYACA6F&Signature=%2BDGio8SVBaTDbrLBbdP7FVlnsYk%3D&Expires=1733963524'
     ]
     
     # Or load from JSON file:
