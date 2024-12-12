@@ -5,6 +5,14 @@ import http.client
 import json
 import subprocess
 import sys
+import logging
+
+# Configure the logging
+logging.basicConfig(
+    filename='app.log',           # Name of the log file
+    level=logging.INFO,           # Log level (e.g., DEBUG, INFO, WARNING, ERROR, CRITICAL)
+    format='%(asctime)s - %(levelname)s - %(message)s'  # Log format
+)
 
 serper_api_key = os.environ.get("SERPER_API_KEY", None)
 if serper_api_key is None:
@@ -17,7 +25,9 @@ if serper_api_key is None:
 
 def main():
     # Example usage:
-    restaurants = sys.argv[:1]
+    restaurants = sys.argv[1:]
+    logging.info(f"called viewer with {sys.argv}")
+    logging.info(f"Searching for videos for {restaurants}")
     video_urls = []
     conn = http.client.HTTPSConnection("google.serper.dev")
     for restaurant in restaurants:

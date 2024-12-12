@@ -173,7 +173,7 @@ async def handle_call_tool(
             raise ValueError("Missing restaurant name")
         logging.info(f'calling let-me-see with arguments {arguments}')
         os.chdir("/Users/stankley/Development/gotta-eat/frontend")
-        subprocess.call(f"uv run viewer {arguments['restaurant_name']}", shell=True)
+        subprocess.call(f"/Users/stankley/Development/gotta-eat/frontend/.venv/bin/viewer \"{arguments.get('restaurant_name')} New York Restaurant\"", shell=True)
 
         return [types.TextContent(type="text", text="Launched videos")]
     if name != "add-note":
