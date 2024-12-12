@@ -1,9 +1,13 @@
 from kivy.app import App
 from kivy.uix.screenmanager import ScreenManager, Screen, SwapTransition
 from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.video import Video
 from kivy.core.window import Window
 from kivy.properties import StringProperty
+from kivy.uix.widget import Widget
+from kivy.clock import Clock
+import os
+import mpv
+
 import os
 import vlc
 from kivy.properties import StringProperty
@@ -21,42 +25,49 @@ serper_api_key = os.environ.get("SERPER_API_KEY", None)
 # Set environment variable for video provider
 os.environ['KIVY_VIDEO'] = 'ffpyplayer'
 
+class MPVPlayer(Widget):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.player = mpv.MPV(
+            input_default_bindings=True,
+            input_vo_keyboard=True,
+            video_unscaled=True,
+            loop='inf'
+        )
+        
+    def play(self, filepath):
+        self.player.play(filepath)
+        
+    def stop(self):
+        self.player.stop()
+        
+    def pause(self):
+        self.player.pause = True
+        
+    def resume(self):
+        self.player.pause = False
+
 class VideoScreen(Screen):
     source = StringProperty(None)
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.layout = BoxLayout(orientation='vertical')
-        
-        # Initialize VLC instance
-        self.instance = vlc.Instance()
-        self.player = self.instance.media_player_new()
-        
-        # Create VideoOutput widget for VLC
-        self.video_widget = Video(
-            allow_stretch=True,
-            size_hint=(1, 1),
-            pos_hint={'center_x': .5, 'center_y': .5}
-        )
-        self.layout.add_widget(self.video_widget)
+        self.player = MPVPlayer()
+        self.layout.add_widget(self.player)
         self.add_widget(self.layout)
         
     def on_source(self, instance, value):
         if value and os.path.exists(value):
             print(f"Loading video: {value}")
-            media = self.instance.media_new(value)
-            self.player.set_media(media)
-            self.player.play()
+            self.player.play(value)
             
     def on_leave(self):
         self.player.stop()
         
     def on_enter(self):
-        self.player.play()
-        
-    def on_size(self, instance, value):
-        if hasattr(self, 'player'):
-            self.player.video_set_scale(0)  # Auto scale
+        if self.source:
+            self.player.play(self.source)
 
 class VideoViewer(App):
     def __init__(self, video_files):
@@ -94,7 +105,6 @@ class VideoViewer(App):
                 else:
                     self.current_index = (self.current_index - 1) % len(self.video_files)
                 self._create_screens()
-                
 def main():
     # Example usage:
 

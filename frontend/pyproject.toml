@@ -9,6 +9,7 @@ dependencies = [
     "ffmpeg>=1.4",
     "kivy>=2.3.0",
     "kivymd>=1.2.0",
+    "mpv>=1.0.7",
     "requests>=2.32.3",
     "tiktokapi>=6.5.2",
     "yt-dlp>=2024.12.6",

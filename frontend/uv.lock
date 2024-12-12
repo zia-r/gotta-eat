@@ -265,6 +265,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/20/81/0b1154f5e581d5910702d9fadb3217f56cb186f72c8b36de0271e7ff9b5c/kivymd-1.2.0.tar.gz", hash = "sha256:2d33e2c59259998e93aee55acde647a4a20e5a0f962469db24ee4c9ec586962e", size = 2160842 }
 
 [[package]]
+name = "mpv"
+version = "1.0.7"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/70/a9/fe30517ebfdc6a9ed5f1d03dfdf4901d078126620d6b600f0bdcc5aa665d/mpv-1.0.7.tar.gz", hash = "sha256:ae17d56176e05e4d046aa28a0732a478c0d58603e878e8da6d82b6c145ae1d82", size = 47052 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/aa/3f/d835556e34804cd0078507ed0f8a550f15d2861b875656193dd3451b720b/mpv-1.0.7-py3-none-any.whl", hash = "sha256:520fb134c18185b69c7fce4aa3514f14371028022d92eb193818e9fefb1e9fe8", size = 45257 },
+]
+
+[[package]]
 name = "pillow"
 version = "11.0.0"
 source = { registry = "https://pypi.org/simple" }
@@ -444,6 +453,7 @@ dependencies = [
     { name = "ffmpeg" },
     { name = "kivy" },
     { name = "kivymd" },
+    { name = "mpv" },
     { name = "requests" },
     { name = "tiktokapi" },
     { name = "yt-dlp" },
@@ -454,6 +464,7 @@ requires-dist = [
     { name = "ffmpeg", specifier = ">=1.4" },
     { name = "kivy", specifier = ">=2.3.0" },
     { name = "kivymd", specifier = ">=1.2.0" },
+    { name = "mpv", specifier = ">=1.0.7" },
     { name = "requests", specifier = ">=2.32.3" },
     { name = "tiktokapi", specifier = ">=6.5.2" },
     { name = "yt-dlp", specifier = ">=2024.12.6" },
