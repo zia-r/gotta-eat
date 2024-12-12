@@ -5,11 +5,15 @@ import mcp.types as types
 from mcp.server import NotificationOptions, Server
 from pydantic import AnyUrl
 import mcp.server.stdio
+import httpx
 
 # Store notes as a simple key-value dict to demonstrate state management
 notes: dict[str, str] = {}
 
 server = Server("gotta-eat")
+
+AUTH_HEADER = 'ResyAPI api_key="VbWk7s3L4KiK5fzlO7JD3Q5EYolJI7n5"'
+USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'
 
 @server.list_resources()
 async def handle_list_resources() -> list[types.Resource]:
@@ -101,17 +105,29 @@ async def handle_list_tools() -> list[types.Tool]:
     """
     return [
         types.Tool(
-            name="add-note",
-            description="Add a new note",
+            name="search-restaurants",
+            description="Search for restaurants in a given area",
             inputSchema={
                 "type": "object",
                 "properties": {
-                    "name": {"type": "string"},
-                    "content": {"type": "string"},
+                    "cuisine": {"type": "string"},
                 },
-                "required": ["name", "content"],
+                "required": ["cuisine"],
             },
-        )
+        ),
+        types.Tool(
+            name="find-reservation-times",
+            description="Find reservation times for a restaurant",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "restaurant_id": {"type": "string"},
+                    "party_size": {"type": "number"},
+                    "date": {"type": "string"},
+                },
+                "required": ["restaurant_id", "party_size", "date"],
+            },
+        ),
     ]
 
 @server.call_tool()
@@ -122,6 +138,13 @@ async def handle_call_tool(
     Handle tool execution requests.
     Tools can modify server state and notify clients of changes.
     """
+    print(f'calling tool {name} with arguments {arguments}')
+    if name == "search-restaurants":
+        print(f'calling search-restaurants with arguments {arguments}')
+        return await search_restaurants(arguments.get("cuisine"))
+    if name == "find-reservation-times":
+        print(f'calling find-reservation-times with arguments {arguments}')
+        return await find_reservation_times(arguments.get("restaurant_id"), arguments.get("party_size"), arguments.get("date"))
     if name != "add-note":
         raise ValueError(f"Unknown tool: {name}")
 
@@ -147,8 +170,56 @@ async def handle_call_tool(
         )
     ]
 
+def get_search_url(cuisine: str) -> str:
+    return f"https://api.resy.com/3/venuesearch/search"
+
+async def search_restaurants(cuisine: str) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
+    return [types.TextContent(type="text", text="Adda venue id: 7291")]
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            get_search_url(cuisine), 
+            data = {
+                "geo": {
+                    "latitude": 40.744679,
+                    "longitude": -73.9485424
+                },
+                "highlight": {
+                    "pre_tag": "<b>",
+                    "post_tag": "</b>"
+                },
+                "per_page": 5,
+                "query": cuisine,
+                "slot_filter": {
+                    "day": "2024-12-11",
+                    "party_size": 2
+                },
+                "types": [
+                    "venue",
+                    "cuisine"
+                ]
+            },
+            headers={'Authorization': AUTH_HEADER, 'User-Agent': USER_AGENT}
+        )
+        response.raise_for_status()
+        return [types.TextContent(type="text", text=str(response.json()))]
+
+    return [types.TextContent(type="text", text="Adda")]
+
+def get_reservation_url(venue_id: str, party_size: int, date: str) -> str:
+    # https://api.resy.com/4/find?lat=0&long=0&day=2024-12-11&party_size=2&venue_id=7291
+    return f"https://api.resy.com/4/find?lat=0&long=0&day={date}&party_size={party_size}&venue_id={venue_id}"
+
+async def find_reservation_times(restaurant_id: str, party_size: int, date: str) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
+    async with httpx.AsyncClient() as client:
+        print(f'finding reservation times for {restaurant_id} on {date} for {party_size} people')
+        response = await client.get(get_reservation_url(restaurant_id, party_size, date), headers={'Authorization': AUTH_HEADER, 'User-Agent': USER_AGENT})
+        response.raise_for_status()
+        return [types.TextContent(type="text", text=str(response.json()))]
+
+
 async def main():
     # Run the server using stdin/stdout streams
+    print(f'starting server')
     async with mcp.server.stdio.stdio_server() as (read_stream, write_stream):
         await server.run(
             read_stream,
