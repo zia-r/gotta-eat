@@ -9,27 +9,42 @@ class VideoPlayerDelegate: NSObject, NSApplicationDelegate {
     var player: AVPlayer!
     
     // Playlist management
-    var videoFiles: [String] = []
+    struct VideoEntry {
+        let path: String
+        let restaurantName: String
+    }
+    var videos: [VideoEntry] = []
     var currentVideoIndex: Int = 0
     
     // UI Elements
     var controlsView: NSView!
     var previousButton: NSButton!
     var nextButton: NSButton!
+    var restaurantLabel: NSTextField!
     
     func applicationDidFinishLaunching(_ notification: Notification) {
-        // Get video paths from command line arguments
-        guard CommandLine.arguments.count > 1 else {
-            print("Usage: swift-video-player <video_file_path1> [video_file_path2 ...]")
+        // Need at least a restaurant name and video path pair
+        guard CommandLine.arguments.count > 2 else {
+            print("Usage: swift-video-player \"Restaurant Name 1\" video1.mp4 \"Restaurant Name 2\" video2.mp4 ...")
             NSApplication.shared.terminate(nil)
             return
         }
         
-        // Store video files
-        videoFiles = Array(CommandLine.arguments.dropFirst())
+        // Parse arguments into video entries
+        let args = Array(CommandLine.arguments.dropFirst())
+        if args.count % 2 != 0 {
+            print("Error: Each video must have a restaurant name")
+            NSApplication.shared.terminate(nil)
+            return
+        }
+        
+        // Create video entries from pairs of arguments
+        for i in stride(from: 0, to: args.count, by: 2) {
+            videos.append(VideoEntry(path: args[i + 1], restaurantName: args[i]))
+        }
         
         // Create the window
-        let windowRect = NSRect(x: 0, y: 0, width: 800, height: 650) // Extra height for controls
+        let windowRect = NSRect(x: 0, y: 0, width: 800, height: 650)
         window = NSWindow(
             contentRect: windowRect,
             styleMask: [.titled, .closable, .miniaturizable, .resizable],
@@ -70,6 +85,14 @@ class VideoPlayerDelegate: NSObject, NSApplicationDelegate {
         nextButton.action = #selector(nextVideo)
         controlsView.addSubview(nextButton)
         
+        // Create restaurant label
+        restaurantLabel = NSTextField(frame: NSRect(x: 230, y: 15, width: 500, height: 20))
+        restaurantLabel.isEditable = false
+        restaurantLabel.isBordered = false
+        restaurantLabel.backgroundColor = .clear
+        restaurantLabel.font = NSFont.systemFont(ofSize: 14, weight: .bold)
+        controlsView.addSubview(restaurantLabel)
+        
         // Setup window
         window.title = "Video Player"
         window.center()
@@ -95,23 +118,24 @@ class VideoPlayerDelegate: NSObject, NSApplicationDelegate {
     }
     
     func playCurrentVideo() {
-        guard currentVideoIndex >= 0 && currentVideoIndex < videoFiles.count else {
+        guard currentVideoIndex >= 0 && currentVideoIndex < videos.count else {
             print("Invalid video index")
             return
         }
         
-        let videoPath = videoFiles[currentVideoIndex]
-        let videoURL = URL(fileURLWithPath: videoPath)
+        let videoEntry = videos[currentVideoIndex]
+        let videoURL = URL(fileURLWithPath: videoEntry.path)
         
         player = AVPlayer(url: videoURL)
         playerView.player = player
         
-        // Update window title with current video
-        window.title = "Video Player - \(videoURL.lastPathComponent) [\(currentVideoIndex + 1)/\(videoFiles.count)]"
+        // Update window title and restaurant label
+        window.title = "Video Player - \(videoURL.lastPathComponent) [\(currentVideoIndex + 1)/\(videos.count)]"
+        restaurantLabel.stringValue = videoEntry.restaurantName
         
         // Update button states
         previousButton.isEnabled = currentVideoIndex > 0
-        nextButton.isEnabled = currentVideoIndex < videoFiles.count - 1
+        nextButton.isEnabled = currentVideoIndex < videos.count - 1
         
         player.play()
     }
@@ -124,7 +148,7 @@ class VideoPlayerDelegate: NSObject, NSApplicationDelegate {
     }
     
     @objc func nextVideo() {
-        if currentVideoIndex < videoFiles.count - 1 {
+        if currentVideoIndex < videos.count - 1 {
             currentVideoIndex += 1
             playCurrentVideo()
         }
