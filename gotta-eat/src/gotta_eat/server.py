@@ -7,6 +7,9 @@ from pydantic import AnyUrl
 import mcp.server.stdio
 import httpx
 
+import subprocess
+
+import os
 # Store notes as a simple key-value dict to demonstrate state management
 notes: dict[str, str] = {}
 
@@ -128,6 +131,17 @@ async def handle_list_tools() -> list[types.Tool]:
                 "required": ["restaurant_id", "party_size", "date"],
             },
         ),
+        types.Tool(
+            name="let-me-see",
+            description="Show me the restaurant",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "restaurant_name": {"type": "string"},
+                },
+                "required": ["restaurant_id"],
+            },
+        )
     ]
 
 @server.call_tool()
@@ -145,6 +159,12 @@ async def handle_call_tool(
     if name == "find-reservation-times":
         print(f'calling find-reservation-times with arguments {arguments}')
         return await find_reservation_times(arguments.get("restaurant_id"), arguments.get("party_size"), arguments.get("date"))
+    if name == "let-me-see":
+        print(f'calling let-me-see with arguments {arguments}')
+        os.chdir("/users/stankley/Development/gotta-eat/frontend")
+        subprocess.call(["uv", "run", "viewer"])
+
+        return [types.TextContent(type="text", text="Launched videos")]
     if name != "add-note":
         raise ValueError(f"Unknown tool: {name}")
 
