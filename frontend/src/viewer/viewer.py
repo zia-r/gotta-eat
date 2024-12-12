@@ -6,9 +6,16 @@ from kivy.uix.label import Label
 from kivy.core.window import Window
 from kivy.properties import StringProperty
 from kivy.clock import Clock
+from TikTokApi import TikTokApi
+from playwright.async_api import async_playwright
+import asyncio
 import requests
 import os
 from concurrent.futures import ThreadPoolExecutor
+import http.client
+import json
+
+serper_api_key = os.environ.get("SERPER_API_KEY", None)
 
 class LoadingScreen(Screen):
     def __init__(self, **kwargs):
@@ -127,14 +134,27 @@ class VideoViewer(App):
     def on_stop(self):
         self.executor.shutdown(wait=False)
 
+
+
 def main():
     # Example usage:
-    video_urls = [
-        "https://vj-video.s3.us-east-1.amazonaws.com//612afec9-bcb2-47ca-807b-756d6e83b4b7/f4aa6faa-a7e3-438c-9392-7f58127125ec/video.mp4?AWSAccessKeyId=AKIATTF3CDVL4EYACA6F&Signature=GjKmPukdP1koILdsQ70WsTI%2FYeI%3D&Expires=1733965700",
-        "https://vj-video.s3.us-east-1.amazonaws.com//612afec9-bcb2-47ca-807b-756d6e83b4b7/c59248ec-405e-4051-b872-a4dbde6a1442/video.mp4?AWSAccessKeyId=AKIATTF3CDVL4EYACA6F&Signature=BEJQ7CiIUHI5rEtV%2BnvtNHU0vek%3D&Expires=1733965700",
-        "https://vj-video.s3.us-east-1.amazonaws.com//612afec9-bcb2-47ca-807b-756d6e83b4b7/48310b2a-5eaa-424b-bd1b-ed2c3a5a10d1/video.mp4?AWSAccessKeyId=AKIATTF3CDVL4EYACA6F&Signature=H2fulfrHZiYVYQzwVI%2FfThIHko4%3D&Expires=1733965700"
-    ]
-    
+
+    restaurants = ["Dhamaka New York", "Adda New York"]
+    video_urls = []
+    conn = http.client.HTTPSConnection("google.serper.dev")
+    for restaurant in restaurants:
+        payload = json.dumps({
+            "q": restaurant
+        })
+        headers = {
+            'X-API-KEY': serper_api_key,
+            'Content-Type': 'application/json'
+        }
+        conn.request("POST", "/videos", payload, headers)
+        res = conn.getresponse()
+        data = res.read()
+        print(data.decode("utf-8"))
+
     # Or load from JSON file:
     # video_urls = load_video_urls('video_urls.json')
     

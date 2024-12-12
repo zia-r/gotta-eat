@@ -439,6 +439,7 @@ dependencies = [
     { name = "kivymd" },
     { name = "requests" },
     { name = "tiktokapi" },
+    { name = "yt-dlp" },
 ]
 
 [package.metadata]
@@ -447,4 +448,14 @@ requires-dist = [
     { name = "kivymd", specifier = ">=1.2.0" },
     { name = "requests", specifier = ">=2.32.3" },
     { name = "tiktokapi", specifier = ">=6.5.2" },
+    { name = "yt-dlp", specifier = ">=2024.12.6" },
+]
+
+[[package]]
+name = "yt-dlp"
+version = "2024.12.6"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/c5/5e/0b632b39b4399a4acbf1c421b0aa656fbbb3d6e4eb78af3d0b09182a8a74/yt_dlp-2024.12.6.tar.gz", hash = "sha256:743dbe081ea871be3f5ff083e2cd95da866dea773fc70ae6b109838cfbf72ac4", size = 2912236 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e8/75/85c878fa4cbc7d0b6965f85af0f6c8f828f1adb567971e7dba099949022c/yt_dlp-2024.12.6-py3-none-any.whl", hash = "sha256:a7b8724e58fff4f3204cae4feb936dbd249ca6d22c5f25dec1b3c6f1cb7745a2", size = 3175289 },
 ]
