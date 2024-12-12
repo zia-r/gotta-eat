@@ -9,6 +9,7 @@ dependencies = [
     "kivy>=2.3.0",
     "kivymd>=1.2.0",
     "requests>=2.32.3",
+    "tiktokapi>=6.5.2",
 ]
 
 [[project.authors]]
