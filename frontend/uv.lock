@@ -88,6 +88,12 @@ wheels = [
 ]
 
 [[package]]
+name = "ffmpeg"
+version = "1.4"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/f0/cc/3b7408b8ecf7c1d20ad480c3eaed7619857bf1054b690226e906fdf14258/ffmpeg-1.4.tar.gz", hash = "sha256:6931692c890ff21d39938433c2189747815dca0c60ddc7f9bb97f199dba0b5b9", size = 5055 }
+
+[[package]]
 name = "greenlet"
 version = "3.1.1"
 source = { registry = "https://pypi.org/simple" }
@@ -435,6 +441,7 @@ name = "viewer"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
+    { name = "ffmpeg" },
     { name = "kivy" },
     { name = "kivymd" },
     { name = "requests" },
@@ -444,6 +451,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
+    { name = "ffmpeg", specifier = ">=1.4" },
     { name = "kivy", specifier = ">=2.3.0" },
     { name = "kivymd", specifier = ">=1.2.0" },
     { name = "requests", specifier = ">=2.32.3" },
