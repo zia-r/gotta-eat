@@ -10,6 +10,15 @@ import httpx
 import subprocess
 
 import os
+import logging
+
+# Configure the logging
+logging.basicConfig(
+    filename='app.log',           # Name of the log file
+    level=logging.INFO,           # Log level (e.g., DEBUG, INFO, WARNING, ERROR, CRITICAL)
+    format='%(asctime)s - %(levelname)s - %(message)s'  # Log format
+)
+
 # Store notes as a simple key-value dict to demonstrate state management
 notes: dict[str, str] = {}
 
@@ -139,7 +148,7 @@ async def handle_list_tools() -> list[types.Tool]:
                 "properties": {
                     "restaurant_name": {"type": "string"},
                 },
-                "required": ["restaurant_id"],
+                "required": ["restaurant_name"],
             },
         )
     ]
@@ -152,17 +161,19 @@ async def handle_call_tool(
     Handle tool execution requests.
     Tools can modify server state and notify clients of changes.
     """
-    print(f'calling tool {name} with arguments {arguments}')
+    logging.info(f'calling tool {name} with arguments {arguments}')
     if name == "search-restaurants":
-        print(f'calling search-restaurants with arguments {arguments}')
+        logging.info(f'calling search-restaurants with arguments {arguments}')
         return await search_restaurants(arguments.get("cuisine"))
     if name == "find-reservation-times":
-        print(f'calling find-reservation-times with arguments {arguments}')
+        logging.info(f'calling find-reservation-times with arguments {arguments}')
         return await find_reservation_times(arguments.get("restaurant_id"), arguments.get("party_size"), arguments.get("date"))
     if name == "let-me-see":
-        print(f'calling let-me-see with arguments {arguments}')
+        if not arguments or "restaurant_name" not in arguments:
+            raise ValueError("Missing restaurant name")
+        logging.info(f'calling let-me-see with arguments {arguments}')
         os.chdir("/Users/stankley/Development/gotta-eat/frontend")
-        subprocess.call(["uv run viewer"], shell=True)
+        subprocess.call(f"uv run viewer {arguments['restaurant_name']}", shell=True)
 
         return [types.TextContent(type="text", text="Launched videos")]
     if name != "add-note":
@@ -231,7 +242,7 @@ def get_reservation_url(venue_id: str, party_size: int, date: str) -> str:
 
 async def find_reservation_times(restaurant_id: str, party_size: int, date: str) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     async with httpx.AsyncClient() as client:
-        print(f'finding reservation times for {restaurant_id} on {date} for {party_size} people')
+        logging.info(f'finding reservation times for {restaurant_id} on {date} for {party_size} people')
         response = await client.get(get_reservation_url(restaurant_id, party_size, date), headers={'Authorization': AUTH_HEADER, 'User-Agent': USER_AGENT})
         response.raise_for_status()
         return [types.TextContent(type="text", text=str(response.json()))]
@@ -239,7 +250,7 @@ async def find_reservation_times(restaurant_id: str, party_size: int, date: str)
 
 async def main():
     # Run the server using stdin/stdout streams
-    print(f'starting server')
+    logging.info(f'starting server')
     async with mcp.server.stdio.stdio_server() as (read_stream, write_stream):
         await server.run(
             read_stream,

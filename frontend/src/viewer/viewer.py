@@ -4,6 +4,7 @@ import os
 import http.client
 import json
 import subprocess
+import sys
 
 serper_api_key = os.environ.get("SERPER_API_KEY", None)
 if serper_api_key is None:
@@ -16,8 +17,7 @@ if serper_api_key is None:
 
 def main():
     # Example usage:
-
-    restaurants = ["Dhamaka New York", "Adda New York"]
+    restaurants = sys.argv[:1]
     video_urls = []
     conn = http.client.HTTPSConnection("google.serper.dev")
     for restaurant in restaurants:
@@ -35,7 +35,8 @@ def main():
         print(obj)
         for video in obj["videos"][:1]:
             if "link" in video:
-                video_urls.append(video["link"])
+                video_urls.append({"restaurant": restaurant, 
+                                   "video": video["link"]})
         conn.close()
     
     print(video_urls)
@@ -47,15 +48,20 @@ def main():
             ["yt-dlp",
              "-f",
              "mp4",
-             url,
+             url["video"],
              "-o",
             f"video_cache/{counter}.mp4"]
         )
-        new_urls.append(f"/Users/stankley/Development/gotta-eat/frontend/video_cache/{counter}.mp4")
+        new_urls.append({"restaurant": url["restaurant"],
+                         "path": f"/Users/stankley/Development/gotta-eat/frontend/video_cache/{counter}.mp4"})
         counter += 1
     # Or load from JSON file:
     # video_urls = load_video_urls('video_urls.json')
-    files = " ".join(new_urls)
+    pairs = []
+    for item in new_urls:
+        pairs.extend([f'"{item["restaurant"]}"', item["path"]])
+
+    files = " ".join(pairs)
     subprocess.call(f"../swifty-frontend/viewer {files}", shell=True)
 
 if __name__ == '__main__':
