@@ -161,8 +161,8 @@ async def handle_call_tool(
         return await find_reservation_times(arguments.get("restaurant_id"), arguments.get("party_size"), arguments.get("date"))
     if name == "let-me-see":
         print(f'calling let-me-see with arguments {arguments}')
-        os.chdir("/users/stankley/Development/gotta-eat/frontend")
-        subprocess.call(["uv", "run", "viewer"])
+        os.chdir("/Users/stankley/Development/gotta-eat/frontend")
+        subprocess.call(["uv run viewer"], shell=True)
 
         return [types.TextContent(type="text", text="Launched videos")]
     if name != "add-note":

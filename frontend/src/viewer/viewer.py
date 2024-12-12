@@ -22,6 +22,14 @@ import json
 import subprocess
 
 serper_api_key = os.environ.get("SERPER_API_KEY", None)
+if serper_api_key is None:
+    with open(".env", "r") as r:
+        for line in r:
+            key, value = line.strip().split("=")
+            if key == "SERPER_API_KEY":
+                serper_api_key = value
+                break
+
 # Set environment variable for video provider
 os.environ['KIVY_VIDEO'] = 'ffpyplayer'
 
