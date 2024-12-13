@@ -9,7 +9,9 @@ class VideoPlayerDelegate: NSObject, NSApplicationDelegate {
     var window: NSWindow!
     var playerView: AVPlayerView!
     var player: AVPlayer!
-    
+    var queuePlayer: AVQueuePlayer!
+    var playerLooper: AVPlayerLooper?
+
     // Playlist management
     struct VideoEntry {
         let path: String
@@ -128,8 +130,21 @@ class VideoPlayerDelegate: NSObject, NSApplicationDelegate {
         let videoEntry = videos[currentVideoIndex]
         let videoURL = URL(fileURLWithPath: videoEntry.path)
         
-        player = AVPlayer(url: videoURL)
-        playerView.player = player
+        // Create a new player item
+        let playerItem = AVPlayerItem(url: videoURL)
+        
+        // Create or reuse queue player
+        if queuePlayer == nil {
+            queuePlayer = AVQueuePlayer()
+            playerView.player = queuePlayer
+        }
+        
+        // Remove existing looper if any
+        playerLooper?.disableLooping()
+        playerLooper = nil
+        
+        // Create new looper
+        playerLooper = AVPlayerLooper(player: queuePlayer, templateItem: playerItem)
         
         // Update window title and restaurant label
         window.title = "Video Player - \(videoURL.lastPathComponent) [\(currentVideoIndex + 1)/\(videos.count)]"
@@ -139,7 +154,7 @@ class VideoPlayerDelegate: NSObject, NSApplicationDelegate {
         previousButton.isEnabled = currentVideoIndex > 0
         nextButton.isEnabled = currentVideoIndex < videos.count - 1
         
-        player.play()
+        queuePlayer.play()
     }
     
     @objc func previousVideo() {
@@ -157,31 +172,31 @@ class VideoPlayerDelegate: NSObject, NSApplicationDelegate {
     }
     
     func handleKeyEvent(_ event: NSEvent) {
-        guard let characters = event.characters else { return }
+       guard let characters = event.characters else { return }
         
         switch characters {
         case " ":
             // Toggle play/pause
-            if player.rate == 0 {
-                player.play()
+            if queuePlayer.rate == 0 {
+                queuePlayer.play()
                 print("Playing")
             } else {
-                player.pause()
+                queuePlayer.pause()
                 print("Paused")
             }
             
         case String(Character(UnicodeScalar(NSLeftArrowFunctionKey)!)):
             // Seek backward 10 seconds
-            let currentTime = player.currentTime()
+            let currentTime = queuePlayer.currentTime()
             let newTime = CMTimeAdd(currentTime, CMTime(seconds: -10, preferredTimescale: 1))
-            player.seek(to: newTime)
+            queuePlayer.seek(to: newTime)
             print("Seeking backward 10 seconds")
             
         case String(Character(UnicodeScalar(NSRightArrowFunctionKey)!)):
             // Seek forward 10 seconds
-            let currentTime = player.currentTime()
+            let currentTime = queuePlayer.currentTime()
             let newTime = CMTimeAdd(currentTime, CMTime(seconds: 10, preferredTimescale: 1))
-            player.seek(to: newTime)
+            queuePlayer.seek(to: newTime)
             print("Seeking forward 10 seconds")
             
         case "n", "N":
