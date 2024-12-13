@@ -173,8 +173,8 @@ async def handle_call_tool(
             raise ValueError("Missing restaurant name")
         logging.info(f'calling let-me-see with arguments {arguments}')
         os.chdir("/Users/stankley/Development/gotta-eat/frontend")
-        subprocess.call(f"/Users/stankley/Development/gotta-eat/frontend/.venv/bin/viewer \"{arguments.get('restaurant_name')} New York Restaurant\"", shell=True)
-
+        # don't block, because this might take a while
+        subprocess.Popen(["uv", "run", "viewer", f"{arguments.get('restaurant_name')} New York Restaurant"])
         return [types.TextContent(type="text", text="Launched videos")]
     if name != "add-note":
         raise ValueError(f"Unknown tool: {name}")

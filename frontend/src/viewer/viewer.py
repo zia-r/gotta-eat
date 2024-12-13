@@ -42,14 +42,14 @@ def main():
         res = conn.getresponse()
         data = res.read()
         obj = json.loads(data.decode("utf-8"))
-        print(obj)
-        for video in obj["videos"][:1]:
+        logging.info(f"Found {len(obj['videos'])} videos for {restaurant}")
+        for video in obj["videos"][:4]:
             if "link" in video:
                 video_urls.append({"restaurant": restaurant, 
                                    "video": video["link"]})
         conn.close()
     
-    print(video_urls)
+    logging.info(f"Downloading {len(video_urls)} videos")
 
     counter = 0
     new_urls =[]

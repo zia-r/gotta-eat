@@ -3,6 +3,8 @@ import AVKit
 import AppKit
 import Foundation
 
+NSApplication.shared.activate(ignoringOtherApps: true)
+
 class VideoPlayerDelegate: NSObject, NSApplicationDelegate {
     var window: NSWindow!
     var playerView: AVPlayerView!
@@ -15,7 +17,7 @@ class VideoPlayerDelegate: NSObject, NSApplicationDelegate {
     }
     var videos: [VideoEntry] = []
     var currentVideoIndex: Int = 0
-    
+
     // UI Elements
     var controlsView: NSView!
     var previousButton: NSButton!
@@ -51,7 +53,7 @@ class VideoPlayerDelegate: NSObject, NSApplicationDelegate {
             backing: .buffered,
             defer: false
         )
-        
+        window.level = .floating 
         // Create the main container view
         let containerView = NSView(frame: windowRect)
         window.contentView = containerView
