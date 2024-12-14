@@ -4,7 +4,9 @@
 
 This is a half-built application for searching restaurants with table availability for your group, and seeing public videos of the venue itself from the Claude desktop app.
 
-It was built at the Anthropic hackathon in NYC, in 3 hours. (Plus a couple afterwards to get video playback working.)
+It was built at the Anthropic hackathon in NYC, in 3 hours. 
+
+(Plus a couple afterwards to get video playback working via a swift app.)
 
 
 ## supported tools 
@@ -52,5 +54,9 @@ From there, you can simply state:
 ```
 can you book an indian restauarant for two tomorrow?
 ```
+
+And you should get a response back from Claude like:
+
+![Screenshot](./assets/screenshot.png)
 
 Note that the server has hardcoded results right now, but you can change them to be active. (we hardcoded things for the hackathon!) Everything you'd likely want to change is right in the `gotta-eat/src/gotta_eat/server.py` file.
