@@ -6,8 +6,7 @@ This is a half-built application for searching restaurants with table availabili
 
 It was built at the Anthropic hackathon in NYC, in 3 hours. 
 
-(Plus a couple afterwards to get video playback working via a swift app.)
-
+(Plus a couple afterwards to get video playback working via a swift app. For now it's got hardcoded values of the restaurant, but that can (easily!) be changed. Check the `gotta-eat/src/gotta_eat/server.py` file to see the appropriate code under our hardcoded, hackathon results.)
 
 ## supported tools 
 
