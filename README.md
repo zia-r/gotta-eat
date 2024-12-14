@@ -58,4 +58,6 @@ And you should get a response back from Claude like:
 
 ![Screenshot](./assets/screenshot.png)
 
-Note that the server has hardcoded results right now, but you can change them to be active. (we hardcoded things for the hackathon!) Everything you'd likely want to change is right in the `gotta-eat/src/gotta_eat/server.py` file.
+Note that the server has hardcoded queries and restaurant ids right now, but you can change them to be dynamic. (we hardcoded things for the hackathon because of errors from the Resy API!) 
+
+Again, everything you'd likely want to change is right in the `gotta-eat/src/gotta_eat/server.py` file.
