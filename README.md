@@ -1,8 +1,13 @@
-# gotta-eat (an MCP Server for finding restaurants built at a hackathon)
+# gotta-eat
 
 ![Architecture](./assets/architecture.png)
 
-This was built at the Anthropic hackathon in NYC, in 3 hours. (Plus a couple afterwards to get video playback working.)
+This is a half-built application for searching restaurants with table availability for your group, and seeing public videos of the venue itself from the Claude desktop app.
+
+It was built at the Anthropic hackathon in NYC, in 3 hours. (Plus a couple afterwards to get video playback working.)
+
+
+## supported tools 
 
 Our MCP server exposes three main tools:
 
