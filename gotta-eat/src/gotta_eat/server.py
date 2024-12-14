@@ -24,7 +24,17 @@ notes: dict[str, str] = {}
 
 server = Server("gotta-eat")
 
-AUTH_HEADER = 'ResyAPI api_key="VbWk7s3L4KiK5fzlO7JD3Q5EYolJI7n5"'
+RESY_API_KEY = os.environ.get("RESY_API_KEY", None)
+
+if RESY_API_KEY is None:
+    with open(".env", "r") as r:
+        for line in r:
+            key, value = line.strip().split("=")
+            if key == "RESY_API_KEY":
+                RESY_API_KEY = value
+                break
+
+AUTH_HEADER = f"ResyAPI api_key=\"{RESY_API_KEY}\""
 USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'
 
 @server.list_resources()
@@ -176,30 +186,8 @@ async def handle_call_tool(
         # don't block, because this might take a while
         subprocess.Popen(["uv", "run", "viewer", f"{arguments.get('restaurant_name')} New York Restaurant"])
         return [types.TextContent(type="text", text="Launched videos")]
-    if name != "add-note":
+    else:
         raise ValueError(f"Unknown tool: {name}")
-
-    if not arguments:
-        raise ValueError("Missing arguments")
-
-    note_name = arguments.get("name")
-    content = arguments.get("content")
-
-    if not note_name or not content:
-        raise ValueError("Missing name or content")
-
-    # Update server state
-    notes[note_name] = content
-
-    # Notify clients that resources have changed
-    await server.request_context.session.send_resource_list_changed()
-
-    return [
-        types.TextContent(
-            type="text",
-            text=f"Added note '{note_name}' with content: {content}",
-        )
-    ]
 
 def get_search_url(cuisine: str) -> str:
     return f"https://api.resy.com/3/venuesearch/search"
