@@ -1,8 +1,19 @@
 import asyncio
 import httpx
 import mcp.types as types
+import os
 
-AUTH_HEADER = 'ResyAPI api_key="VbWk7s3L4KiK5fzlO7JD3Q5EYolJI7n5"'
+RESY_API_KEY = os.environ.get("RESY_API_KEY", None)
+
+if RESY_API_KEY is None:
+    with open(".env", "r") as r:
+        for line in r:
+            key, value = line.strip().split("=")
+            if key == "RESY_API_KEY":
+                RESY_API_KEY = value
+                break
+
+AUTH_HEADER = f"ResyAPI api_key=\"{RESY_API_KEY}\""
 USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'
 
 
